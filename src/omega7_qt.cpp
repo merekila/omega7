@@ -45,9 +45,18 @@ void CE_OO::initialize_stuff(){
     dhdEnableForce (DHD_ON);
 }
 
+void CE_OO::setScalingFactors(double scalefactor_trans_x, double scalefactor_trans_y, double scalefactor_trans_z, double scalefactor_rot_x, double scalefactor_rot_y, double scalefactor_rot_z){
+    scale_trans_x = scalefactor_trans_x;
+    scale_trans_y = scalefactor_trans_y;
+    scale_trans_z = scalefactor_trans_z;
+    scale_rot_x = scalefactor_rot_x;
+    scale_rot_y = scalefactor_rot_y;
+    scale_rot_z = scalefactor_rot_z;
+}
+
 bool CE_OO::run(){
 
-    ros::Rate r(100);
+    ros::Rate r(50);
 
     //TEST SECTOR
     //------------------------------------------------
@@ -84,28 +93,22 @@ bool CE_OO::run(){
         // print out encoders according to system type
         // ROS_INFO_STREAM("Positions(" <<  px << "," << py << "," << pz << ")");
 
-        // set variables of position in m
-        pose.pose.position.x = px;
-        pose.pose.position.y = py;
-        pose.pose.position.z = pz;
+        // set variables of scaled position in m
+        pose.pose.position.x = py * -scale_trans_y;
+        pose.pose.position.y = pz * scale_trans_z;
+        pose.pose.position.z = px * -scale_trans_x;
         
-        //commented lines from omega_publisher.cpp
-        //----------------------------------------------
-        /*
-        pose.pose.orientation.x = ox;
-        pose.pose.orientation.y = oy;
-        pose.pose.orientation.z = oz;
 
-        // get angle of gripper (range: 0° - 28°)
-        dhdGetGripperAngleDeg(&gr);
-
-        // set w of pose variable as angle of gripper
-        pose.pose.orientation.w = gr;
-        */
-        //----------------------------------------------
+        //scale the rotation
+        scaled_ox = oy * -scale_rot_y;
+        scaled_oy = oz * scale_rot_z;
+        //scaled_oz = ox * scale_rot_x;
+        scaled_oz = oz;
+        
+        
 
         //convert Euler to Quaternion
-        q = tf::createQuaternionFromRPY(ox, oy, oz);
+        q = tf::createQuaternionFromRPY(scaled_ox, scaled_oy, scaled_oz);
 
         //set variables of rotation
         
@@ -142,6 +145,7 @@ int main( int argc, char** argv )
     ros::init(argc, argv, "omega7_qt");
     ros::NodeHandle n;
     CE_OO instance(&n);
+    instance.setScalingFactors(3, 3, 3, 0.03, 0.03, 0.03);
     instance.run();
 }
 

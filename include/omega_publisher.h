@@ -18,6 +18,8 @@ class CE_OO{
 public:    
     CE_OO(ros::NodeHandle*);
     bool run();
+    void setScalingFactors(double scalefactor_trans_x, double scalefactor_trans_y, double scalefactor_trans_z, double scalefactor_rot_x, double scalefactor_rot_y, double scalefactor_rot_z);
+
 protected:
     ros::NodeHandle *n;
     ros::Publisher omega_pub;
@@ -31,7 +33,10 @@ protected:
     int encCount;
     double px, py, pz;
     double ox, oy, oz;
+    double scaled_ox, scaled_oy, scaled_oz;
     tf::Quaternion q;
     double gr;
+    double scale_trans_x, scale_trans_y, scale_trans_z;
+    double scale_rot_x, scale_rot_y, scale_rot_z;
 };
 #endif
