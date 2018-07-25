@@ -127,11 +127,13 @@ bool CE_OO::run(){
         pitchMatrix.setEulerYPR(0, scaled_oy, 0);
         yawMatrix.setEulerYPR(scaled_oz, 0, 0);
 
-        rotMatrix *= rollMatrix;
-        rotMatrix = pitchMatrix * rotMatrix;
-        rotMatrix = yawMatrix * rotMatrix;
+        rollMatrix *= rotMatrix;
+        pitchMatrix *= rollMatrix; 
+        yawMatrix *= pitchMatrix;        
+        //rotMatrix = pitchMatrix * rotMatrix;
+        //rotMatrix = yawMatrix * rotMatrix;
 
-        rotMatrix.getRotation(q);
+        yawMatrix.getRotation(q);
  
  
  
