@@ -96,7 +96,7 @@ bool CE_OO::run(){
         }
 
         // update end-effector position and orientation variables
-        dhdGetPositionAndOrientationDeg (&px, &py, &pz, &ox, &oy, &oz);
+        dhdGetPositionAndOrientationRad (&px, &py, &pz, &ox, &oy, &oz);
 
         // print out encoders according to system type
         // ROS_INFO_STREAM("Positions(" <<  px << "," << py << "," << pz << ")");
@@ -122,6 +122,8 @@ bool CE_OO::run(){
         std::cout<< "scaled oy is "<< scaled_oy<<std::endl;
         std::cout<< "scaled oz is "<< scaled_oz<<std::endl;
  */
+
+/*
         //Transformation
         rollMatrix.setEulerYPR(0, 0, scaled_ox);
         pitchMatrix.setEulerYPR(0, scaled_oy, 0);
@@ -134,8 +136,11 @@ bool CE_OO::run(){
         //rotMatrix = yawMatrix * rotMatrix;
 
         yawMatrix.getRotation(q);
- 
- 
+
+        std::cout<< "x of quaternion q is "<< q.x()<<std::endl;
+ */
+        //the RPY values of setRPY are related to the FIXED axis! Thats what is needed!
+        q.setRPY(scaled_ox, scaled_oy, scaled_oz);
  
  /*       
         //convert Euler to Quaternion
@@ -153,7 +158,7 @@ bool CE_OO::run(){
         rotMatrix.getRotation(q);
         std::cout<< "x of quaternion is q"<< q.x()<<std::endl;
 */
-
+        //q *= 0.2;
 
 
         //set rotation variables of PoseStamped message
@@ -190,7 +195,7 @@ int main( int argc, char** argv )
     ros::init(argc, argv, "omega7_qt");
     ros::NodeHandle n;
     CE_OO instance(&n);
-    instance.setScalingFactors(3, 3, 3, 0.1, 0.03, 0.03);
+    instance.setScalingFactors(3, 3, 3, 1, 1, 1);
     instance.run();
 }
 
